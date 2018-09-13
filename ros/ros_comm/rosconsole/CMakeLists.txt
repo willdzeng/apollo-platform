@@ -20,13 +20,15 @@ if(ROSCONSOLE_BACKEND STREQUAL "" OR ROSCONSOLE_BACKEND STREQUAL "log4cxx")
     find_library(LOG4CXX_LIBRARIES log4cxx)
   endif()
   if(LOG4CXX_LIBRARIES)
-    list(APPEND rosconsole_backend_INCLUDE_DIRS ${LOG4CXX_INCLUDE_DIRS})
-    list(APPEND rosconsole_backend_LIBRARIES rosconsole_log4cxx rosconsole_backend_interface ${LOG4CXX_LIBRARIES})
+    list(APPEND rosconsole_backend_INCLUDE_DIRS ${LOG4CXX_INCLUDE_DIRS} ${Boost_INCLUDE_DIRS})
+    list(APPEND rosconsole_backend_LIBRARIES rosconsole_log4cxx rosconsole_backend_interface ${LOG4CXX_LIBRARIES} ${Boost_LIBRARIES} ${Boost_SYSTEM_LIBRARY})
     set(ROSCONSOLE_BACKEND "log4cxx")
   elseif(ROSCONSOLE_BACKEND STREQUAL "log4cxx")
     message(FATAL_ERROR "Couldn't find log4cxx library")
   endif()
 endif()
+
+# set(ROSCONSOLE_BACKEND "")
 if(ROSCONSOLE_BACKEND STREQUAL "" OR ROSCONSOLE_BACKEND STREQUAL "glog")
   find_package(PkgConfig)
   pkg_check_modules(GLOG QUIET libglog)
@@ -46,7 +48,7 @@ message(STATUS "rosconsole backend: ${ROSCONSOLE_BACKEND}")
 
 catkin_package(
   INCLUDE_DIRS include ${rosconsole_backend_INCLUDE_DIRS} ${Boost_INCLUDE_DIRS}
-  LIBRARIES rosconsole ${rosconsole_backend_LIBRARIES} ${Boost_LIBRARIES}
+  LIBRARIES rosconsole ${rosconsole_backend_LIBRARIES} ${Boost_LIBRARIES} ${Boost_SYSTEM_LIBRARY}
   CATKIN_DEPENDS cpp_common rostime
   CFG_EXTRAS rosconsole-extras.cmake
 )
@@ -69,15 +71,15 @@ include_directories(include ${catkin_INCLUDE_DIRS} ${rosconsole_backend_INCLUDE_
 add_library(rosconsole_backend_interface src/rosconsole/rosconsole_backend.cpp)
 
 add_library(rosconsole src/rosconsole/rosconsole.cpp)
-target_link_libraries(rosconsole ${rosconsole_backend_LIBRARIES} ${catkin_LIBRARIES} ${Boost_LIBRARIES})
+target_link_libraries(rosconsole ${rosconsole_backend_LIBRARIES} ${catkin_LIBRARIES} ${Boost_LIBRARIES} ${Boost_SYSTEM_LIBRARY})
 
 if(ROSCONSOLE_BACKEND STREQUAL "log4cxx")
   add_library(rosconsole_log4cxx src/rosconsole/impl/rosconsole_log4cxx.cpp)
-  target_link_libraries(rosconsole_log4cxx rosconsole_backend_interface ${LOG4CXX_LIBRARIES} ${Boost_LIBRARIES})
+  target_link_libraries(rosconsole_log4cxx rosconsole_backend_interface ${LOG4CXX_LIBRARIES} ${Boost_LIBRARIES} ${Boost_SYSTEM_LIBRARY})
 
   if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/test/speed_test.cpp")
     add_executable(rosconsole_speed_test test/speed_test.cpp)
-    target_link_libraries(rosconsole_speed_test rosconsole ${rosconsole_backend_LIBRARIES} ${catkin_LIBRARIES} ${Boost_LIBRARIES})
+    target_link_libraries(rosconsole_speed_test rosconsole ${rosconsole_backend_LIBRARIES} ${catkin_LIBRARIES} ${Boost_LIBRARIES} ${Boost_SYSTEM_LIBRARY})
   endif()
 elseif(ROSCONSOLE_BACKEND STREQUAL "glog")
   add_library(rosconsole_glog src/rosconsole/impl/rosconsole_glog.cpp)

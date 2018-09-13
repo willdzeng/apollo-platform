@@ -66,15 +66,15 @@ function clean() {
 }
 
 function build_ros() {
-    
+
     rm -f ${FASTRTPS_PATH} ${TP_LIB_PATH}
     ln -sf ${FASTRTPS_PATH}_${MACHINE_ARCH} ${FASTRTPS_PATH} &&
     ln -sf ${TP_LIB_PATH}_${MACHINE_ARCH} ${TP_LIB_PATH} &&
 
     ./catkin/bin/catkin_make_isolated --install --source . \
-        --install-space ${INSTALL_PATH} -DCMAKE_BUILD_TYPE=${BUILD_TYPE} \
+        --install-space ${INSTALL_PATH} -DCMAKE_BUILD_TYPE=${BUILD_TYPE} -DBUILD_SHARED_LIBS=0 \
        -DFASTRTPS_PATH=${FASTRTPS_PATH} --cmake-args --no-warn-unused-cli &&
- 
+
     cp -r ${CURRENT_PATH}/third_party/fast-rtps/lib/* ${INSTALL_PATH}/lib/ &&
     cp -r ${CURRENT_PATH}/third_party/lib/* ${INSTALL_PATH}/lib/ &&
     cp -r ${CURRENT_PATH}/third_party/bin/* ${INSTALL_PATH}/bin/ &&

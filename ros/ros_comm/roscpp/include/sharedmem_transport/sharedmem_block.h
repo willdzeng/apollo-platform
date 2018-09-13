@@ -50,6 +50,8 @@
 #include <signal.h>
 #include <setjmp.h>
 #include <inttypes.h>
+#include <sys/mman.h>
+
 
 #include "ros/forwards.h"
 #include "ros/message_deserializer.h"

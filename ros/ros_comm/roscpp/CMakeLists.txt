@@ -30,7 +30,7 @@ include_directories(include ${CATKIN_DEVEL_PREFIX}/${CATKIN_GLOBAL_INCLUDE_DESTI
 
 add_message_files(
   DIRECTORY msg
-  FILES Logger.msg SharedMemoryHeader.msg  
+  FILES Logger.msg SharedMemoryHeader.msg
 )
 
 add_service_files(
@@ -89,13 +89,13 @@ SET(DISCOVERY_IDL_SRCS ${CMAKE_CURRENT_SOURCE_DIR}/src/libros/discovery/MetaMess
 #)
 
 # Add discovery for python tools
-add_library(discovery SHARED
+add_library(discovery
   src/libros/discovery/participant.cpp
   ${DISCOVERY_IDL_SRCS}
 )
-target_link_libraries(discovery fastcdr fastrtps -fPIC)
+target_link_libraries(discovery fastcdr fastrtps -fPIC -lrt rt)
 
-add_library(roscpp 
+add_library(roscpp
   src/libros/master.cpp
   src/libros/network.cpp
   src/libros/subscriber.cpp
@@ -160,13 +160,14 @@ add_dependencies(roscpp roscpp_gencpp rosgraph_msgs_gencpp metric_msgs_gencpp st
 target_link_libraries(roscpp
   ${catkin_LIBRARIES}
   ${Boost_LIBRARIES}
+  ${FASTRTPS_LIBRARY_DIR}
   fastrtps
   fastcdr
   yaml-cpp
   -lrt
-  )
+)
 
-add_library(shm_manager SHARED
+add_library(shm_manager
   src/libros/sharedmem_transport/sharedmem_util.cpp
   src/libros/sharedmem_transport/sharedmem_block.cpp
   src/libros/sharedmem_transport/sharedmem_segment.cpp
@@ -210,7 +211,7 @@ install(TARGETS discovery
 message("${CATKIN_GLOBAL_ETC_DESTINATION}")
 install(FILES transport_mode.yaml
   DESTINATION ${CATKIN_GLOBAL_ETC_DESTINATION}/ros)
-  
+
 #node test
 add_executable(talker test_node/talker.cpp)
 add_executable(listener test_node/listener.cpp)
@@ -234,9 +235,9 @@ catkin_add_gtest(test_shm
   src/libros/sharedmem_transport/sharedmem_publisher_impl.cpp
   src/libros/sharedmem_transport/sharedmem_segment.cpp
   src/libros/sharedmem_transport/sharedmem_util.cpp)
-  
-target_link_libraries(test_shm 
+
+target_link_libraries(test_shm
   ${catkin_LIBRARIES}
-  ${Boost_LIBRARIES} 
+  ${Boost_LIBRARIES}
   roscpp
   gtest)
